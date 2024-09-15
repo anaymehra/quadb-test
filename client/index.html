@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HODLINFO</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo"><img src="./assets/HODLINFO.8f78fc06.png" alt="HODLINFO logo"></div>
+            <button class="button" id="headerBuyBtc"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 50 50"
+                style="fill:#FFFFFF;">
+                <path d="M46.137,6.552c-0.75-0.636-1.928-0.727-3.146-0.238l-0.002,0C41.708,6.828,6.728,21.832,5.304,22.445	c-0.259,0.09-2.521,0.934-2.288,2.814c0.208,1.695,2.026,2.397,2.248,2.478l8.893,3.045c0.59,1.964,2.765,9.21,3.246,10.758	c0.3,0.965,0.789,2.233,1.646,2.494c0.752,0.29,1.5,0.025,1.984-0.355l5.437-5.043l8.777,6.845l0.209,0.125	c0.596,0.264,1.167,0.396,1.712,0.396c0.421,0,0.825-0.079,1.211-0.237c1.315-0.54,1.841-1.793,1.896-1.935l6.556-34.077	C47.231,7.933,46.675,7.007,46.137,6.552z M22,32l-3,8l-3-10l23-17L22,32z"></path>
+                </svg> Connect to Telegram</button>
+        </header>
+        <div class="buttons-container">
+            <div class="dropdown">
+                <button class="dropdown-button">INR ▼</button>
+                <div class="dropdown-content">
+                    <a href="#">INR</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-button">BTC ▼</button>
+                <div class="dropdown-content">
+                    <a href="#">BTC</a>
+                </div>
+            </div>
+            <button class="buy-btc-button" id="mainBuyBtc">BUY BTC</button>
+        </div>
+        <div class="price-info">
+            <div class="heading-title">Best Price to Trade (Click on BuyBtc to fetch)</div>
+            <div class="price-container">
+                <div class="percentage-item">
+                    <div class="percentage">0.1 %</div>
+                    <div class="time-period">5 Mins</div>
+                </div>
+                <div class="percentage-item">
+                    <div class="percentage">0.96 %</div>
+                    <div class="time-period">1 Hour</div>
+                </div>
+                <div class="best-price-container">
+                    <div class="best-price" id="bestPrice">₹ 26,56,110</div>
+                    <div class="price-subtitle">Average BTC/INR net price including commission</div>
+                </div>
+                <div class="percentage-item">
+                    <div class="percentage">2.73 %</div>
+                    <div class="time-period">1 Day</div>
+                </div>
+                <div class="percentage-item">
+                    <div class="percentage">7.51 %</div>
+                    <div class="time-period">7 Days</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Platform</th>
+                        <th>Last Traded Price</th>
+                        <th>Buy / Sell Price</th>
+                        <th>Volume</th>
+                        <th>Base Unit</th>
+                    </tr>
+                </thead>
+                <tbody id="cryptoData">
+                    <!-- Data will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function makeAPICall() {
+            try {
+                const response = await fetch("http://localhost:3000/");
+                const data = await response.json();
+                updateUI(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        function updateUI(data) {
+            const tbody = document.getElementById('cryptoData');
+            tbody.innerHTML = ''; // Clear existing data
+
+            let bestPrice = 0;
+
+            data.forEach((item, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                
+                    <td>${index + 1}</td>
+                    <td><img src="./assets/bitcoin.png" alt="${item.name}" class="platform-logo"> ${item.name}</td>
+                    <td>₹ ${parseFloat(item.last).toLocaleString('en-IN')}</td>
+                    <td>₹ ${parseFloat(item.buy).toLocaleString('en-IN')} / ₹ ${parseFloat(item.sell).toLocaleString('en-IN')}</td>
+                    <td>${parseFloat(item.volume).toLocaleString('en-IN')}</td>
+                    <td>${item.base_unit.toUpperCase()}</td>
+                
+                `;
+
+                if (parseFloat(item.last) > bestPrice) {
+                    bestPrice = parseFloat(item.last);
+                }
+            });
+
+            document.getElementById('bestPrice').textContent = `₹ ${bestPrice.toLocaleString('en-IN')}`;
+        }
+
+        // Fetch data only when user clicks on a buy btc button
+        document.getElementById('headerBuyBtc').addEventListener('click', makeAPICall);
+        document.getElementById('mainBuyBtc').addEventListener('click', makeAPICall);
+        
+    </script>
+</body>
+</html>
